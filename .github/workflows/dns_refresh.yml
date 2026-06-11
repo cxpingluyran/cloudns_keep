@@ -1,0 +1,36 @@
+name: ClouDNS Keep Alive
+
+on:
+  schedule:
+    # 国际标准时间 (UTC)。这里设定为每周一的凌晨 0 点执行一次（比一个月一次更稳妥）
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # 允许你在 GitHub 页面上手动点击运行
+
+jobs:
+  refresh-dns:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Query DNS Records
+      run: |
+        # 请把下面的 your-domain.cloudns.org 换成你自己的真实域名
+        DOMAIN="cxping2025.ip-ddns.com"
+        
+        echo "开始向全球主要公共 DNS 刷新域名流量..."
+        
+        echo "1. 使用系统默认 DNS 查询..."
+        nslookup $DOMAIN
+        
+        echo "2. 向 Google DNS (8.8.8.8) 查询..."
+        nslookup $DOMAIN 8.8.8.8
+        
+        echo "3. 向 Cloudflare DNS (1.1.1.1) 查询..."
+        nslookup $DOMAIN 1.1.1.1
+        
+        echo "4. 向 Quad9 DNS (9.9.9.9) 查询..."
+        nslookup $DOMAIN 9.9.9.9
+        
+        echo "DNS 流量刷新完成！"
